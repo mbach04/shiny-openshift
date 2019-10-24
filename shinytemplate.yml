@@ -20,13 +20,15 @@ metadata:
     openshift.io/provider-display-name: CSC
     tags: r, shiny
     template.openshift.io/bindable: "false"
-  name: shinyserver
+  name: ${NAME}
 
 objects:
 - apiVersion: "v1"
   kind: "PersistentVolumeClaim"
   metadata:
     name: ${NAME}-pvc
+    labels:
+      app: ${NAME}
   spec:
     accessModes:
       - "ReadWriteMany"
@@ -38,6 +40,8 @@ objects:
   kind: Service
   metadata:
     name: ${NAME}
+    labels:
+      app: ${NAME}
   spec:
     ports:
     - port: 80
@@ -50,6 +54,8 @@ objects:
   kind: Route
   metadata:
     name: ${NAME}-route
+    labels:
+      app: ${NAME}
     annotations:
       template.openshift.io/expose-uri: http://{.spec.host}
   spec:
@@ -66,32 +72,6 @@ objects:
       description: Keeps track of changes in the appliation image
     name: ${NAME}
 
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    name: ${NAME}
-    annotations:
-      description: Defines how to build the application
-      template.alpha.openshift.io/wait-for-ready: "true"
-  spec:
-    source:
-      type: Git
-      git:
-        uri: ${SOURCE_REPOSITORY_URL}
-        ref: ${SOURCE_REPOSITORY_REF}
-      contextDir: ${CONTEXT_DIR}
-    strategy:
-      dockerStrategy:
-        buildArgs:
-          - name: tag
-            value: shinyv1
-    output:
-      to:
-        kind: ImageStreamTag
-        name: ${NAME}:latest
-    triggers:
-      - type: ImageChange
-      - type: ConfigChange
 ##
 - apiVersion: v1
   kind: DeploymentConfig
@@ -100,19 +80,22 @@ objects:
       description: R Shiny server deployment
       template.alpha.openshift.io/wait-for-ready: "true"
     name: ${NAME}
+    labels:
+      app: ${NAME}
   spec:
     strategy:
       type: Rolling
     triggers:
+      - type: ConfigChange
       - type: ImageChange
         imageChangeParams:
-          automatic: true
           containerNames:
             - shinyserver
+          automatic: false
           from:
             kind: ImageStreamTag
-            name: ${NAME}:latest
-      - type: ConfigChange
+            name: ${RSHINYIMAGE}
+            namespace: ${ISNAMESPACE}
     replicas: 1
     template:
       metadata:
@@ -126,7 +109,7 @@ objects:
               claimName: ${NAME}-pvc
         containers:
           - name: shinyserver
-            image: ${NAME}:latest
+            image: ${RSHINYIMAGE}
             ports:
               - containerPort: 3838
             readinessProbe:
@@ -185,3 +168,15 @@ parameters:
   displayName: Application Hostname Suffix
   name: APPLICATION_DOMAIN_SUFFIX
   value: rahtiapp.fi
+
+- description: The R-Shiny image to use. 
+  displayName: R-Shiny image
+  name: RSHINYIMAGE
+  value: rshiny:latest
+  required: true
+
+- description: Namespace of the R-Shiny
+  displayName: R-Shiny image namespace
+  name: ISNAMESPACE
+  value: cscfi
+  required: false
