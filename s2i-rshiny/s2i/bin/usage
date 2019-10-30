@@ -1,0 +1,22 @@
+#!/bin/bash -e
+cat <<EOF
+This is the rshiny-rocker S2I image:
+To use it, install S2I: https://github.com/openshift/source-to-image
+
+Sample invocation:
+
+s2i build <source code path/URL> rshiny-rocker <application image>
+
+The source code path should have minimally the following structure:
+
+```
+application/
+PACKAGES
+```
+
+Where PACKAGES is a newline separated list, in utf-8, of arguments to
+`install2.r -e` command.
+
+You can then run the resulting image via:
+docker run <application image>
+EOF

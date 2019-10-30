@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# S2I assemble script for the 'rshiny-rocker' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+find /tmp/
+echo "---> Installing packages..."
+cat /tmp/src/PACKAGES | xargs install2.r -e
+echo "---> Installing application..."
+mv /tmp/src/application /srv/shiny-server
