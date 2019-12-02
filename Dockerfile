@@ -1,5 +1,14 @@
+# s2i-rshiny
 FROM rocker/shiny:latest
-LABEL maintainer="Juha Hulkkonen <juha.hulkkonen@csc.fi>"
+LABEL maintainer="CSC Cloud Solutions Team <servicedesk@csc.fi>"
+
+ENV BUILDER_VERSION 1.0
+
+# TODO: Set labels used in OpenShift to describe the builder image
+LABEL io.k8s.description="Builder image for R Shiny applications" \
+      io.k8s.display-name="R Shiny builder 1.0.0" \
+      io.openshift.expose-services="3838:http" \
+      io.openshift.tags="builder,app-rshiny"
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends \
@@ -25,9 +34,10 @@ RUN install2.r -e shinydashboard \
  plotly \
  shinyBS \
  lubridate \
- shinyWidgets \
- causaleffect
+ shinyWidgets
 
+
+RUN install2.r -e shinydashboard
 
 COPY shiny-server.conf /etc/shiny-server/shiny-server.conf
 RUN chown -R shiny /srv/shiny-server/
@@ -44,3 +54,17 @@ RUN chmod a+rx /usr/bin/shiny-server.sh
 # Make sure the directory for individual app logs exists and is usable
 RUN chmod -R a+rwX /var/log/shiny-server
 RUN chmod -R a+rwX /var/lib/shiny-server
+
+RUN mkdir -p /.s2i
+COPY ./s2i/bin/ /.s2i
+
+# TODO: Drop the root user and make the content of /opt/app-root owned by user 1001
+# RUN chown -R 1001:1001 /opt/app-root
+RUN chown -R 1:0 /usr/local/ /srv/shiny-server /tmp
+USER 1
+
+EXPOSE 3838
+
+CMD ["/.s2i/usage"]
+
+LABEL io.openshift.s2i.scripts-url="image:///.s2i/" 
