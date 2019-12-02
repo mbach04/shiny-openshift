@@ -3,18 +3,21 @@
 VERSION=2.0
 
 function usage() { # {{{
-  echo "Usage:"
-  echo -e "\t-h"
-  echo -e "\t\tThis help"
-  echo -e "\t-s"
-  echo -e "\t\tStart new build for the base S2I image."
-  echo -e "\t\tDefault: Start build."
-  echo -e "\t-S"
-  echo -e "\t\tRecreate S2I build objects. Not implemented."
-  echo -e "\t\tDefault: Don't recreate."
-  echo -e "\t-a <app-dir>"
-  echo -e "\t\tUse S2I image to build application in <app-dir>."
-  echo -e "\t\tDefault: Don't build application. app-dir=\"test-app\"."
+cat <<EOF
+Build helper for debugging shiny S2I images. Version 2.0
+Usage:
+	-h
+		This help
+	-s
+		Start new build for the base S2I image.
+		Default: Start build.
+	-S
+		Recreate S2I build objects. Not implemented.
+		Default: Don't recreate.
+	-a <app-dir>
+		Use S2I image to build application in <app-dir>.
+		Default: Don't build application. app-dir="test-app".
+EOF
 } # }}}
 
 function s2iimage() {
