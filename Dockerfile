@@ -1,4 +1,4 @@
-FROM rocker/shiny:latest
+FROM quay.agilesof.com/mbach/shiny:latest
 LABEL maintainer="Juha Hulkkonen <juha.hulkkonen@csc.fi>"
 
 RUN apt-get update
