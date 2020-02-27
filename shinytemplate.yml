@@ -14,7 +14,7 @@ metadata:
       Based on https://hub.docker.com/r/rocker/shiny Dockerfile
     iconClass: icon-other-linux
     openshift.io/display-name: R Shiny server
-    openshift.io/documentation-url: https://github.com/CSCfi/shiny-openshift
+    openshift.io/documentation-url: https://github.com/mbach04/shiny-openshift
     openshift.io/support-url: 
     openshift.io/long-description: TBA
     openshift.io/provider-display-name: CSC
