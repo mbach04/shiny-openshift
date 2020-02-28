@@ -184,4 +184,4 @@ parameters:
 - description: The exposed hostname suffix that will be used to create routes for app
   displayName: Application Hostname Suffix
   name: APPLICATION_DOMAIN_SUFFIX
-  value: apps.yourcluster.comi
+  value: apps.yourcluster.com
